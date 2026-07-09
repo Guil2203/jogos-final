@@ -18,3 +18,4 @@ MonoBehaviour:
   Scale: {x: 0.75, y: 1, z: 0.75}
   Material: {fileID: 2100000, guid: cea8a4df346fed94ca8d777a6566267d, type: 2}
   Mesh: {fileID: 8314571269056883277, guid: a101fc92ca9c2fb48bfde4838cbb3490, type: 3}
+  DestructionParticles: {fileID: 8779318035924551014, guid: abab3e57c6c95c94f8ae5da465492328, type: 3}

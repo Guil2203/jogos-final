@@ -7,6 +7,7 @@ public class Target : MonoBehaviour
     private float _duration;
     private float _timer;
     public static Action<int> OnHit;
+    private ParticleSystem _particles;
 
     void Update()
     {
@@ -20,6 +21,9 @@ public class Target : MonoBehaviour
     public void Hit()
     {
         OnHit?.Invoke(_score);
+        _particles.transform.position = gameObject.transform.position;
+        ParticleSystem.Instantiate(_particles).Play();
+        //_particles.Play();
         Destroy(gameObject);
     }
 
@@ -27,6 +31,7 @@ public class Target : MonoBehaviour
     {
         _score = targetSO.Score;
         _duration = targetSO.Duration;
+        _particles = targetSO.DestructionParticles;
         gameObject.transform.localScale = targetSO.Scale;
         GetComponent<MeshRenderer>().materials = new Material[2]{targetSO.Material, GetComponent<MeshRenderer>().materials[1]};
         GetComponent<MeshFilter>().mesh = targetSO.Mesh;

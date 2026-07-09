@@ -9,4 +9,5 @@ public class TargetSO : ScriptableObject
     public Vector3 Scale = new Vector3(0.5f, 1f, 0.5f);
     public Material Material;
     public Mesh Mesh;
+    public ParticleSystem DestructionParticles;
 }

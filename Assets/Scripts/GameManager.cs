@@ -12,21 +12,22 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private List<TargetSO> _possibleTargets;
     [SerializeField] private Target _targetPrefab;
-    private bool _gameStarted;
+    public bool _gameStarted;
     [SerializeField] private float _spawnCooldown = 1f;
     private float _timer;
     [SerializeField] private float _gameDuration = 60f;
     private float _spawnTimer;
     private int _score;
     private float _timeUpdate = 0f;
-    
+
     [SerializeField] private TextMeshProUGUI _scoreText, _timeLeftText;
     [SerializeField] private Button _gameOverBtn;
-    
-    //[Header("Audios")]
-    
+    [SerializeField] private AudioSource _timeRunOut;
 
-    
+    //[Header("Audios")]
+
+
+
 
     void Awake()
     {
@@ -36,7 +37,7 @@ public class GameManager : MonoBehaviour
     void OnEnable()
     {
         Target.OnHit += AddScore;
-        
+
     }
 
     void OnDisable()
@@ -46,7 +47,7 @@ public class GameManager : MonoBehaviour
 
     private void AddScore(int score)
     {
-        _score += score;   
+        _score += score;
         _scoreText.text = _score.ToString();
     }
 
@@ -59,6 +60,7 @@ public class GameManager : MonoBehaviour
     {
         _gameOverBtn.gameObject.SetActive(true);
         _gameStarted = false;
+        _timeRunOut.Play();
     }
 
     private void EndGame()
@@ -90,7 +92,7 @@ public class GameManager : MonoBehaviour
         if (_spawnTimer >= _spawnCooldown)
         {
             var randomPos = Random.insideUnitCircle * 5f;
-            
+
             float result = Random.Range(0, _possibleTargets.Sum(x => x.Chance)); // expressão Lambda (bem importante 👀)
             (int intID, int intSum) chancePackage = (0, _possibleTargets[0].Chance);
             while (result > chancePackage.intSum)
@@ -98,7 +100,7 @@ public class GameManager : MonoBehaviour
                 Debug.Log("Result: "  + result + " ID: " + chancePackage.intID + " Sum: " + chancePackage.intSum);
                 chancePackage.intID++;
                 chancePackage.intSum += _possibleTargets[chancePackage.intID].Chance;
-                
+
             }
             var randomTargetSO = _possibleTargets[chancePackage.intID];
             var target = Instantiate(_targetPrefab, new Vector3(randomPos.x, randomPos.y, 0f), Quaternion.Euler(-90, 0, 0));

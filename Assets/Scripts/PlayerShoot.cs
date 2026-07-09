@@ -1,8 +1,7 @@
-using System.Numerics;
 using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UI;
 
 public class PlayerShoot : MonoBehaviour
 {
@@ -10,15 +9,45 @@ public class PlayerShoot : MonoBehaviour
     private Camera _camera;
     [SerializeField] private AudioSource shoot;
     [SerializeField] private AudioSource targetHit;
+    [SerializeField] private AudioSource comboSound;
+    [SerializeField] private AudioSource comboLoseSound;
     [SerializeField] private AnimationCurve _curve;
+    float comboProgress = 0f;
     float progress = 0f;
+    [SerializeField] public ParticleSystem shootParticles;
+    [SerializeField] private float comboDuration = 3f;
+    private int comboScore;
+    [SerializeField] private Slider _slider;
+    private bool isComboLost = true;
 
     void Start()
     {
         _gameManager = FindFirstObjectByType<GameManager>();
         _camera = Camera.main;
+        
     }
 
+    async void Combo()
+    {
+        if (comboProgress > 0)
+        {
+            comboProgress = 1;
+            comboScore++;
+            
+            return;
+        }
+        comboScore = 1;
+        comboProgress = 1;
+        
+        while (comboProgress > 0)
+        {
+            comboProgress -= Time.deltaTime / comboDuration;
+            _slider.value = comboProgress;
+            await Task.Yield();
+        }
+        comboScore = 0;
+    }
+    
     async void Recoil()
     {
         if (progress > 0f)
@@ -36,22 +65,52 @@ public class PlayerShoot : MonoBehaviour
             progress -= Time.deltaTime * 5;
             await Task.Yield();
         }
-        
     }
     
     void Update()
     {
+        if (comboScore == 0 && isComboLost == false)
+        {
+            comboLoseSound.Play();
+            isComboLost = true;
+        }
         if (Mouse.current.leftButton.wasPressedThisFrame)
         {
             var ray = _camera.ScreenPointToRay(Mouse.current.position.value);
             if (Physics.Raycast(ray, out var raycastHit))
             {
-                shoot.Play();
-                Recoil();
+                if (_gameManager._gameStarted)
+                {
+                    shoot.Play();
+                    Recoil();
+                    shootParticles.transform.position = raycastHit.point;
+                    ParticleSystem.Instantiate(shootParticles).Play();
+                    
+                }
+                
                 if (raycastHit.collider.TryGetComponent<Target>(out var target))
                 {
                     target.Hit();
                     targetHit.Play();
+                    Combo();
+                    isComboLost = false;
+                    if (comboScore == 1)
+                    {
+                        comboSound.pitch = 1.0f;
+                        comboSound.Play();
+                        if (comboScore == 2)
+                        {
+                            comboSound.pitch = 1.2f;
+                            comboSound.Play();
+                        }
+                    }
+                    
+                }
+                else
+                {
+                    comboScore = 0;
+                    comboProgress = 0;
+                    _slider.value = 0;
                 }
             }
         }
