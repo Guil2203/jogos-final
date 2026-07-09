@@ -1,19 +1,25 @@
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
+    [SerializeField] private int SceneToLoad = 1;
     private bool Pressed = false;
     private bool IsHovering = false;
     private bool Released = false;
     [SerializeField] private int StartDelay = 500;
     [SerializeField] private float LerpSpeed = 1;
     [SerializeField] private EventTrigger _playButton;
+    [SerializeField] private UnityEvent _gameStarted;
     
     [Header("Audios")]
-    [SerializeField] private AudioSource audioHoverIn, audioHoverOut, audioPointerDown, audioPointerUp;
+    [SerializeField] private AudioSource audioHoverIn;
+    [SerializeField] private AudioSource audioHoverOut;
+    [SerializeField] private AudioSource audioPointerDown;
+    [SerializeField] private AudioSource audioPointerUp;
     
     
 
@@ -51,7 +57,13 @@ public class MenuManager : MonoBehaviour
     private async void StartGame()
     {
         await Task.Delay(StartDelay);
-        SceneManager.LoadScene(1);
+        _gameStarted.Invoke();
+        if (SceneToLoad < 0)
+        {
+            
+            return;
+        }
+        SceneManager.LoadScene(SceneToLoad);
     }
 
     private void Update()

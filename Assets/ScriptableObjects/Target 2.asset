@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c39c2f9b94dcfbf4db294f1c95359fa5, type: 3}
-  m_Name: Target 1
+  m_Name: Target 2
   m_EditorClassIdentifier: Assembly-CSharp::TargetSO
-  Score: 1
-  Duration: 1
-  Chance: 80
-  Scale: {x: 0.75, y: 1, z: 0.75}
-  Material: {fileID: 2100000, guid: cea8a4df346fed94ca8d777a6566267d, type: 2}
-  Mesh: {fileID: 8314571269056883277, guid: a101fc92ca9c2fb48bfde4838cbb3490, type: 3}
+  Score: 3
+  Duration: 2
+  Chance: 20
+  Scale: {x: 0.5, y: 1, z: 0.5}
+  Material: {fileID: 2100000, guid: 9f8b3380cb381dc4aa4d040d72bd676a, type: 2}
+  Mesh: {fileID: 8999911773206952699, guid: 5b3ca4b5014575648bbfe6e595988450, type: 3}

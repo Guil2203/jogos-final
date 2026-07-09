@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
@@ -11,7 +12,6 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private List<TargetSO> _possibleTargets;
     [SerializeField] private Target _targetPrefab;
-    [SerializeField] private Button _startButton;
     private bool _gameStarted;
     [SerializeField] private float _spawnCooldown = 1f;
     private float _timer;
@@ -22,18 +22,21 @@ public class GameManager : MonoBehaviour
     
     [SerializeField] private TextMeshProUGUI _scoreText, _timeLeftText;
     [SerializeField] private Button _gameOverBtn;
+    
+    //[Header("Audios")]
+    
 
     
 
     void Awake()
     {
-        _startButton.onClick.AddListener(StartGame);
         _gameOverBtn.onClick.AddListener(EndGame);
     }
 
     void OnEnable()
     {
         Target.OnHit += AddScore;
+        
     }
 
     void OnDisable()
@@ -47,10 +50,9 @@ public class GameManager : MonoBehaviour
         _scoreText.text = _score.ToString();
     }
 
-    private void StartGame()
+    public void StartGame()
     {
         _gameStarted = true;
-        _startButton.gameObject.SetActive(false);
     }
 
     private void GameOver()
@@ -73,10 +75,10 @@ public class GameManager : MonoBehaviour
         _timeUpdate += Time.deltaTime;
 
 
-        if (_timeUpdate > 1f)
+        if (_timeUpdate > 0.5f)
         {
             TimeSpan time = TimeSpan.FromSeconds(_gameDuration - _timer);
-            string formattedTime = time.ToString(@"mm\:ss");
+            string formattedTime = time.ToString(@"m\:ss");
             _timeLeftText.text = formattedTime;
             _timeUpdate = 0f;
         }
@@ -88,13 +90,20 @@ public class GameManager : MonoBehaviour
         if (_spawnTimer >= _spawnCooldown)
         {
             var randomPos = Random.insideUnitCircle * 5f;
+            
+            float result = Random.Range(0, _possibleTargets.Sum(x => x.Chance)); // expressão Lambda (bem importante 👀)
+            (int intID, int intSum) chancePackage = (0, _possibleTargets[0].Chance);
+            while (result > chancePackage.intSum)
+            {
+                Debug.Log("Result: "  + result + " ID: " + chancePackage.intID + " Sum: " + chancePackage.intSum);
+                chancePackage.intID++;
+                chancePackage.intSum += _possibleTargets[chancePackage.intID].Chance;
+                
+            }
+            var randomTargetSO = _possibleTargets[chancePackage.intID];
             var target = Instantiate(_targetPrefab, new Vector3(randomPos.x, randomPos.y, 0f), Quaternion.Euler(-90, 0, 0));
-            var randomTargetSO = _possibleTargets[Random.Range(0, _possibleTargets.Count)];
             target.SetTarget(randomTargetSO);
             _spawnTimer = 0f;
         }
-
-
-
     }
 }
